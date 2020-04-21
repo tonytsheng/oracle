@@ -1,0 +1,17 @@
+# populate arrays of values while looping through an ssi file
+# cannot do a command like the line below because a pipe generates a subshell and 
+# will you lose array values
+# grep -v '#' ${SSFILE} | awk -F':' '{print $3" "$4}' | while read REPHOST REPDB;do
+
+# populate the array
+while read REPHOST REPDB
+do
+  REPHOST[${REPNUM}] = ${REPHOST}
+  REPDB[${REPNUM}] = ${REPDB}
+  REPNUM = $((REPNUM+1))
+done < <(grep -v '#' ${SSIFILE} | awk -F':' '{print $3" "$4}')
+
+# print value from array
+for (( REPNUM=1; REPNUM<${REPLICATES}+1; REPNUM ++ )); do
+  echo "delete extract ${REPDB [ ${REPNUM} ] }"
+Done
