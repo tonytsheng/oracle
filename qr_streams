@@ -1,0 +1,56 @@
+Skip problematic transaction using ignore_transaction capture or apply parameter:
+
+execute dbms_capture_adm.stop_capture('<capture_name>'); 
+execute dbms_capture_adm.set_parameter('<capture_name>','ignore_transaction','<local_transaction_id>'); 
+execute dbms_capture_adm.start_capture('<capture_name>'); 
+
+Get txid from gv$streams_transaction look for 3 columns that start with xid
+
+execute dbms_capture_adm.stop_capture (capture_name => 'CAPNAME',force=>true);
+execute dbms_apply_adm.stop_apply (apply_name => 'APPNAME',force=>true);
+execute dbms_propagation_adm.stop_propagation (propagation_name => 'PROPNAME',force=>true);
+
+select capture_name from dba_capture;
+select apply_name from dba_apply;
+select propagation_name from dba_propagation;
+
+select queue_table from dba_queue_tables;
+select name from dba_queues;
+exec dbms_streams_adm.remove_queue (queue_name => 'QNAME',cascade=>true);
+
+Start stop streams in the proper order
+Use distinct capture, prop, applys
+
+Mvdd error
+
+Turn on tracing on cap/prop/apply
+
+set _send_streams_dictionary to infinite
+
+++ Fixscn script:
+connect strmadmin/password
+scn=select DBMS_FLASHBACK.GET_SYSTEM_CHANGE_NUMBER() from dual
+
+exec dbms_capture_adm.stop_capture('CAPTURE')
+BEGIN
+ DBMS_CAPTURE_ADM.ALTER_CAPTURE(
+   capture_name => 'CAPTURE',
+   first_scn    =>  <REQUIRED_CHECKPOINT_SCN>);
+END;
+/
+exec dbms_capture_adm.set_parameter(<CaptureName>, '_SEND_STREAMS_DICTIONARY', 'INFINITE');
+
+exec dbms_capture_adm.start_capture('CAPTURE').
+++
+
+
+exec dbms_streams_adm.set_tag(hextoraw('17')); - do not replicate this session's stuff
+
+apply_error_procs.sql - load this everywhere under sau
+
+exec dbms_streams_adm.remove_streams_configuration -- the big hammer!!
+
+Develop process to sync data while apps are up
+
+Select sid, serial#, inst_id, sql_id from gv$session where username='SAU'. Select sql_text from v$sql where sql_id='xxxx'
+
