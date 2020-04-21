@@ -54,3 +54,33 @@ Develop process to sync data while apps are up
 
 Select sid, serial#, inst_id, sql_id from gv$session where username='SAU'. Select sql_text from v$sql where sql_id='xxxx'
 
+++ Streams Dictionary Check
+select owner, object_name, CREATED, LAST_DDL_TIME from dba_objects where object_name ='RAW_TRANSACTION' and owner='APP_OWNER';
+On Source:
+~~~~~~~~~~~~
+select owner, object_name, object_id, CREATED, LAST_DDL_TIME from dba_objects where object_name ='RAW_TRANSACTION' and owner='APP_OWNER';
+Use the object_id in the sql below.
+
+On Source and Target:
+**********************
+spool LOGMINER_INFO#1.html
+
+alter session set nls_date_format='dd­mon­yyyy hh24:mi:ss';
+
+select global_name, sysdate from global_name;
+
+select count(*), logmnr_uid,keyobj#,baseobjv# from system.logmnrc_gtlo
+group by logmnr_uid,keyobj#,baseobjv#
+order by logmnr_uid, keyobj#, baseobjv#;
+
+select count(*), logmnr_uid, obj#,objv#, intcol# from system.logmnrc_gtcs
+group by logmnr_uid, obj#,objv#, intcol#
+order by logmnr_uid, obj#, objv#,intcol#;
+
+select logmnr_uid,obj#,objv#, segcol#, intcol#, colname, type#, length
+from system.logmnrc_gtcs
+where obj# in (<obj#>, <obj#>) order by obj#, objv#, segcol#, colname;
+
+spool off
+
+
