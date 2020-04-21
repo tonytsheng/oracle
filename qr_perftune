@@ -1,0 +1,55 @@
+# sqlforpid
+
+spid=$1
+
+sqlplus -S / as sysdba <<EQ | egrep -v 'SQL_HASH|---' | sed -n '/^$/!p' > /tmp/getsql$$
+select a.sql_hash_value from v\$session a
+, v\$process b
+where a.paddr=b.addr and b.spid='${spid}'
+;
+EQ
+
+hash=`cat /tmp/getsql$$`
+sqlplus -S / as sysdba <<EQ
+select sql_text from v$sqltext_with_newlines where hash_value = $hash order by piece;
+EQ
+
+
+#sqltrace on
+execute dbms_system.set_sql_trace_in_session (sid, serial#, true)
+
+# trace
+alter session set events = '10046 trace name context forever, level 12';
+set timing on;
+set autotrace on;
+
+# rownum, paginate
+select id, rnum from
+(select a.*, rownum rnum
+from (select * from stage where action=1) a
+where rownum <=50)
+where rnum >=30
+
+# set up for awr
+set -x
+ORACLE_BASE=/oracle/app/oracle;export ORACLE_BASE
+ORACLE_SID=proddb;export ORACLE_SID
+ORACLE_HOME=/oracle/app/oracle/product/10.2.0/rac;export ORACLE_HOME
+YESTERDAY=`TZ=GMT+24 date +%Y-%m-%d`;export YESTERDAY
+echo $YESTERDAY
+
+/oracle/TTS/SCRIPTLIB/getawr.sh $YESTERDAY 08 09 /oracle/TTS/placid.$YESTERDAY.0800.0900.awr.txt > /dev/null
+
+sqlplus / as sysdba <<EQ
+set linesize 100;
+set termout on
+spool $outfile
+Select output from table(DBMS_WORKLOAD_REPOSITORY.AWR_REPORT_TEXT(
+   l_dbid       IN    NUMBER,
+   l_inst_num   IN    NUMBER,
+   l_bid        IN    NUMBER,
+   l_eid        IN    NUMBER));
+
+
+
+
