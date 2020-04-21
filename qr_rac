@@ -1,0 +1,21 @@
+crsctl stat res ora.asm -p
+crsctl modify res ora.asm 
+
+# Oracle RAC checks
+ifconfig -a
+
+public - eth0
+vip - eth0:1
+interconnect - eth1
+
+nfs:
+cat /etc/fstab
+cat /proc/mounts
+
+crsctl stat res -init -t 
+crsctl start res ora.crsd - init
+
+nslookup crs-scan
+
+# doc 1050908.1 - troubleshooting grid infrastructure startup issues
+
