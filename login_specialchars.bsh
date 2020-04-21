@@ -1,0 +1,2 @@
+sqlplus password with special characters
+sqlplus abcd/\"D\@e\$B3t\"
