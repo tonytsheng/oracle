@@ -1,0 +1,26 @@
+# disk usage of directories
+du -sh * 
+
+# find big files
+find . -type f -size +500000k -exec -ls -lh {} \; | awk '{print $9 " : " $5}'
+
+# random number loop
+for id in `cat ids`
+do
+c=$((RANDOM%4+0))
+echo $id $c
+done
+
+# high cpu tools
+/bin/ps -ep pcpu,pid.user,args | sort -k 1 -r
+top -b -n2 -d1
+
+# loop counter
+c=1
+total=15
+while [ ${c} -lt 15 ] 
+do
+echo 
+   let c=c+1
+done
+
