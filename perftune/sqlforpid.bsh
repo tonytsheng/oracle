@@ -1,0 +1,15 @@
+# sqlforpid
+
+spid=$1
+
+sqlplus -S / as sysdba <<EQ | egrep -v 'SQL_HASH|---' | sed -n '/^$/!p' > /tmp/getsql$$
+select a.sql_hash_value from v\$session a
+, v\$process b
+where a.paddr=b.addr and b.spid='${spid}'
+;
+EQ
+
+hash=`cat /tmp/getsql$$`
+sqlplus -S / as sysdba <<EQ
+select sql_text from v$sqltext_with_newlines where hash_value = $hash order by piece;
+EQ
