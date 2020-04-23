@@ -1,1 +1,1 @@
-/oracle/db/ohome/bin/dbca -silent -datafileDestination /oracle/db/oradata/drmdev01 -responseFile dbca.drmdev01 
+/oracle/db/ohome/bin/dbca -silent -datafileDestination /oracle/db/oradata/dev01 -responseFile dbca.dev01 
