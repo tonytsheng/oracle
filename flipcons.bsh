@@ -1,0 +1,25 @@
+USER=$1
+PASSWORD=$2
+SID=$3
+ACTION=$4
+
+sqlplus -S ${USER}/${PASSWORD}@${SID}<<EQ
+set serveroutput on
+set linesize 200
+col constraint_name format a30
+col constraint_type format a20
+select constraint_name, status from user_constraints
+where constraint_type in ('R','P');
+
+begin
+for i in (select table_name, constraint_name from user_constraints where constraint_type in ('R'))
+loop
+  execute immediate 'alter table ' ||i.table_name|| ' ${ACTION} constraint ' ||i.constraint_name;
+--  dbms_output.put_line ('alter table ' ||i.table_name|| ' ${ACTION} constraint ' ||i.constraint_name||';');
+end loop;
+end;
+/
+
+select constraint_name, status from user_constraints
+where constraint_type in ('R','P');
+EQ
