@@ -1,0 +1,67 @@
+print_msg() {
+echo "+-----+-----+-----+-----+"
+echo `date +%Y%m%d.%H%M%S` $1
+echo "+-----+-----+-----+-----+"
+}
+
+function create_tablespaces() {
+tsname=$1
+tspath=$2
+print_msg "create_tablespaces()" 
+export ORACLE_SID=${SID}
+sqlplus -S / as sysdba <<EQ
+create tablespace ${tsname} datafile '${tspath}' size 500M;
+exit
+EQ
+}
+
+function create_users(){
+user=$1
+default_ts=$2
+print_msg "create_users()" 
+export ORACLE_SID=${SID}
+sqlplus -S / as sysdba <<EQ
+drop user ${user} cascade;
+create user ${user} identified by "${user}" default tablespace ${default_ts};
+grant create session to ${user};
+grant connect to ${user};
+grant unlimited tablespace to ${user};
+grant create table to ${user};
+grant create sequence to ${user};
+grant create procedure to ${user};
+grant create package to ${user};
+grant create trigger to ${user};
+exit
+EQ
+}
+
+function create_ddl(){
+print_msg "create_ddl()" 
+USER=$1 
+SID=$2 
+export ORACLE_SID=${SID} 
+sqlplus -S ${USER}/${USER}<<EQ
+@DDL/csh_v3.sql
+EQ
+}
+
+
+#---#---#---#---#---#---#---#---#---#---#---#---#---#---#---#
+DBA_SSI=SSI/ssi.dba
+REP_SSI=SSI/ssi.rep
+while read HOST SID SCHEMA TSDATANAME TSDATAPATH TSIDXNAME TSIDXPATH TDE SSL
+do
+  echo "+++" ${HOST} "::" ${SID} "::" ${SCHEMA} "::" ${TSDATANAME} "::" ${TSDATAPATH} "::" ${TSIDXNAME} "::" ${TSIDXPATH} "::" ${TDE} "::" ${SSL}
+  create_tablespaces ${TSDATANAME} ${TSDATAPATH}
+  create_tablespaces ${TSIDXNAME} ${TSIDXPATH}
+  create_users ${SCHEMA} ${TSDATANAME}
+  create_ddl ${SCHEMA} ${SID}
+done < <(grep -v '#' ${DBA_SSI} | awk -F':' '{print $1" "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9}' )
+
+# populate the array
+#while read REPHOST REPDB
+#do
+#  REPHOST[${REPNUM}] = ${REPHOST}
+#  REPDB[${REPNUM}] = ${REPDB}
+#  REPNUM = $((REPNUM+1))
+#done < <(grep -v '#' ${SSIFILE} | awk -F':' '{print $3" "$4}')
