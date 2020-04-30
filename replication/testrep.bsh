@@ -1,0 +1,76 @@
+print_msg() {
+  echo "+-----+-----+-----+-----+"
+  echo `date +%Y%m%d.%H%M%S` $1
+  echo "+-----+-----+-----+-----+"
+}
+
+check_tablecount(){
+  USER=$1
+  PASSWORD=$2
+  SID=$3
+  NUMROWS=`sqlplus -S ${USER}/${PASSWORD}@${SID}<<EQ | sed '/^$/d' | egrep -v 'rows|----|COUNT'
+set linesize 200
+col table_name format a30
+select count(*) from channels;
+EQ`
+  return ${NUMROWS}
+}
+
+insert_into(){
+  USER=$1
+  PASSWORD=$2
+  SID=$3
+sqlplus -S ${USER}/${PASSWORD}@${SID}<<EQ 
+insert into 
+channels
+values
+( (select max(channel_id) from channels) + 1
+, 'TTS'
+,'TTSclass'
+, 100
+, 'TOTAL'
+, 300);
+commit;
+EQ
+}
+
+delete_from(){
+  USER=$1
+  PASSWORD=$2
+  SID=$3
+sqlplus -S ${USER}/${PASSWORD}@${SID}<<EQ 
+delete from channels
+where channel_id= ( (select max(channel_id) from channels) );
+commit;
+EQ
+}
+
+DBA_SSI=/home/oracle/tsheng/SSI/ssi.dba
+REP_SSI=/home/oracle/tsheng/SSI/ssi.rep
+while read PRIHOST PRISID PRISCHEMA PRIPW REPHOST REPSID REPSCHEMA REPPW
+do
+  print_msg "Initial check" 
+  check_tablecount ${PRISCHEMA} ${PRIPW} ${PRISID}
+  PRIROWS=$?
+  check_tablecount ${REPSCHEMA} ${REPPW} ${REPSID}
+  REPROWS=$?
+  print_msg "PRIROWS: ${PRIROWS} -- REPROWS: ${REPROWS} "
+  sleep 2
+  print_msg "Insert into ${PRISID}"
+  insert_into ${PRISCHEMA} ${PRIPW} ${PRISID} 
+  sleep 10
+  check_tablecount ${PRISCHEMA} ${PRIPW} ${PRISID}
+  PRIROWS=$?
+  check_tablecount ${REPSCHEMA} ${REPPW} ${REPSID}
+  REPROWS=$?
+  print_msg "PRIROWS: ${PRIROWS} -- REPROWS: ${REPROWS} "
+  sleep 2
+  print_msg "Delete from ${REPSID}"
+  delete_from ${REPSCHEMA} ${REPPW} ${REPSID} 
+  sleep 10
+  check_tablecount ${PRISCHEMA} ${PRIPW} ${PRISID}
+  PRIROWS=$?
+  check_tablecount ${REPSCHEMA} ${REPPW} ${REPSID}
+  REPROWS=$?
+  print_msg "PRIROWS: ${PRIROWS} -- REPROWS: ${REPROWS} "
+done < <(grep -v '#' ${REP_SSI} | awk -F':' '{print $1" "$2" "$3" "$4" "$5" "$6" "$7" "$8}' )
