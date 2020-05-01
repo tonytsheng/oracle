@@ -54,7 +54,7 @@ do
   PRIROWS=$?
   check_tablecount ${REPSCHEMA} ${REPPW} ${REPSID}
   REPROWS=$?
-  print_msg "PRIROWS: ${PRIROWS} -- REPROWS: ${REPROWS} "
+  print_msg "${PRISID}: ${PRIROWS} -- ${REPSID}: ${REPROWS} "
   sleep 2
   print_msg "Insert into ${PRISID}"
   insert_into ${PRISCHEMA} ${PRIPW} ${PRISID} 
@@ -63,7 +63,7 @@ do
   PRIROWS=$?
   check_tablecount ${REPSCHEMA} ${REPPW} ${REPSID}
   REPROWS=$?
-  print_msg "PRIROWS: ${PRIROWS} -- REPROWS: ${REPROWS} "
+  print_msg "${PRISID}: ${PRIROWS} -- ${REPSID}: ${REPROWS} "
   sleep 2
   print_msg "Delete from ${REPSID}"
   delete_from ${REPSCHEMA} ${REPPW} ${REPSID} 
@@ -72,5 +72,5 @@ do
   PRIROWS=$?
   check_tablecount ${REPSCHEMA} ${REPPW} ${REPSID}
   REPROWS=$?
-  print_msg "PRIROWS: ${PRIROWS} -- REPROWS: ${REPROWS} "
+  print_msg "${PRISID}: ${PRIROWS} -- ${REPSID}: ${REPROWS} "
 done < <(grep -v '#' ${REP_SSI} | awk -F':' '{print $1" "$2" "$3" "$4" "$5" "$6" "$7" "$8}' )
