@@ -1,0 +1,5 @@
+++ Replicat 
+
+select apply_name, queue_name from dba_apply;
+select replicat_name, server_name from dba_goldengate_inbound;
+select * from dba_gg_inbound_progress
