@@ -1,0 +1,2 @@
+firewall-cmd --zone=public --permanent --add-port=7820-7830/tcp
+firewall-cmd --zone=public --permanent --list-ports
