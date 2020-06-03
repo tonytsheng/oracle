@@ -1,0 +1,23 @@
+awk '{printf (NR%5==0) ? $0 "\n" : $0}' inputfile #inputfile is a file with groups of 5 outputs - this groups them into one line
+
+inputfile:
+++ AWARDED_LINEITEMS
+
+173 rows created.
+
+Elapsed: 27:55:56
+++ TABLE2
+
+193 rows created.
+
+Elapsed: 17:55:56
+++ TABLE3
+
+17 rows created.
+
+Elapsed: 7:55:56
+
+out:
+++ AWARDED_LINEITEMS 173 rows created. Elapsed: 27:55:56
+++ TABLE2 193 rows created. Elapsed: 17:55:56
+++ TABLE3 17 rows created. Elapsed: 7:55:56
