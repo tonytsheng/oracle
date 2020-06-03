@@ -1,0 +1,11 @@
+cd .ssh on both servers
+
+on source:
+ssh-keygen -t rsa
+
+copy the key in id_rsa.pub to authorized_keys on destination
+
+perms should be
+authorized_keys - 600
+/home/oracle - 750
+/home/oracle/.ssh - 700
