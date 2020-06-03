@@ -1,0 +1,19 @@
+select sequence#, first_time, next_time, applied
+from v$archived_log
+order by sequence#;
+
+start mrp
+
+select sequence#
+, to_char(first_time, 'MM/DD/YYYY HH24:MI:SS') FIRST
+, to_char(next_time, 'MM/DD/YYYY HH24:MI:SS') NEXT
+, applied
+, archived
+from v$archived_log
+order by sequence#;
+
+select process, status, thread#, sequence#, block#, blocks
+from v$managed_standby
+where process='MRP0';
+
+select status, database_role, open_mode from v$database, v$instance;
