@@ -1,0 +1,28 @@
+unzip ${patches}/${reldate}/p${this_combo}_121020_${this_platform}.zip
+cd ${this_combo}
+
+../opatch prereq CheckConflictAgainstOHWithDetail -ph ./${db_patch}
+../opatch prereq CheckConflictAgainstOHWithDetail -ph ./${jvm_patch}
+
+#fix for perms issue post patching
+ls -l ${ORACLE_HOME}/lib/libsqlplus*.so
+chmod 644 ${ORACLE_HOME}/lib/libsqlplus.so
+
+cd ${ORACLE_HOME}/Opatch
+sqlplus "/ as sysdba" | tee -a postinstall_${ORACLE_SID}_${today}.log
+  startup upgrade
+  host ./datapatch -verbose
+  show parameter filesystemio_options
+  alter system set XXXXX
+  shutdown
+  startup
+  @?/rdbms/admin/utlrp.sql
+  set lines 200 pages 10
+  select * from dba_registry_sqlpatch where action_time > (sysdate-1);
+  exit
+
+lsnrctl start 
+
+find . ${ORACLE_HOME}/sqlpatch ${ORACLE_BASE}/cfgtoollogs/sqlpatch ${ORACLE_HOME}cfgtoollogs/opatch -name "*.log" \
+  -mtime -1 -print | xargs grep -E "^[[:alnum:]]{3}-[[:digit:]]{5}" || echo "No errors"
+  
