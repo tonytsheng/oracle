@@ -1,0 +1,5 @@
+col grantee format a30
+col granted_role format a30
+set linesize 200
+
+select grantee, granted_role from dba_role_privs where grantee='USER';
