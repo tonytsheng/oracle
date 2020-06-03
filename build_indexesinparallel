@@ -1,0 +1,1 @@
+alter /*+ parallel (12) */ index TABLE.PK1 rebuild online;
