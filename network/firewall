@@ -1,2 +1,7 @@
 firewall-cmd --zone=public --permanent --add-port=7820-7830/tcp
 firewall-cmd --zone=public --permanent --list-ports
+
+if OGG is not working:
+TCP/IP error 113 (No route to host), endpoint: hostname:port
+also make sure mgr is up and running on both sides
+
