@@ -1,0 +1,9 @@
+rman target=/@rman <<EQ
+run{
+set newname for datafile 5 to 'PATH/data.dbf';
+restoe datafile 5;
+switch datafile all;
+recover datafile 5;
+alter database open;
+}
+EQ
