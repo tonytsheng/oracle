@@ -2,7 +2,7 @@ unzip ${patches}/${reldate}/p${this_combo}_121020_${this_platform}.zip
 cd ${this_combo}
 
 ../opatch prereq CheckConflictAgainstOHWithDetail -ph ./${db_patch}
-../opatch prereq CheckConflictAgainstOHWithDetail -ph ./${jvm_patch}
+../opatch apply
 
 #fix for perms issue post patching
 ls -l ${ORACLE_HOME}/lib/libsqlplus*.so
