@@ -1,0 +1,5 @@
+for pid in `ps aux | grep oracle | sort -n -r -k 3 | head -5 | awk -F' ' '{print $2}'`
+do
+echo $pid
+sqlforpid.sh $pid
+done
