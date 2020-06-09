@@ -1,0 +1,1 @@
+impdp parfile=impdp.par TABLE_EXISTS_ACTION=replace directory=DATA_PUMP_DIR dumpfile=dumpfile.dmp logfile=logfile
