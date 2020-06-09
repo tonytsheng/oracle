@@ -1,0 +1,2 @@
+expdp "@/rman" SCHEMAS=${SCHEMA} directory=DATA_PUMP_DIR dumpfile=${ORACLE_SID}_${TIMESTAMP}.dmp logfile=log
+
