@@ -1,0 +1,42 @@
+YESTERDAY=`TZ=GMT+24 date +%Y-%m-%d`;export YESTERDAY
+
+sqlplus -S / as sysdba <<EQ | egrep -v '\---|rows|DBID|^$' | sed 's/ //g' >> /tmp/dbid.$$
+select dbid from v\$database;
+EQ
+DBID=`cat /tmp/dbid.$$'
+rm /tmp/dbid.$$
+
+sqlplus -S / as sysdba <<EQ | egrep -v '\---|rows|SNAP|^$' | sed 's/ //g' >> /tmp/beg_snap.$$
+select snap_id
+from dba_hist_snapshot
+where to_char(begin_interval_time, 'YYYY-MM-DD HH24:MI')='${YESTERDAY} 08:00';
+EQ
+BEG_SNAP=`cat /tmp/beg_snap.$$'
+rm /tmp/beg_snap.$$
+
+sqlplus -S / as sysdba <<EQ | egrep -v '\---|rows|SNAP|^$' | sed 's/ //g' >> /tmp/end_snap.$$
+select snap_id
+from dba_hist_snapshot
+where to_char(begin_interval_time, 'YYYY-MM-DD HH24:MI')='${YESTERDAY} 14:00';
+EQ
+END_SNAP=`cat /tmp/end_snap.$$'
+rm /tmp/end_snap.$$
+
+export OUTFILE=${OUTDIR}/awr_${ORACLE_SID}_${BEG_SNAP}_${END_SNAP}.txt
+
+sqlplus / as sysdba <<EQ
+set linesize 100
+set termout on;
+spool ${OUTFILE};
+
+select output from table(dbms_workload_repository.awr_report_text(
+${DBID}
+, 1
+, ${BEG_SNAP}
+, ${END_SNAP}
+)
+)
+;
+EQ
+
+mailx -a ${OUTFILE} -s "${OUTFILE}" hello@mail.com < /dev/null
