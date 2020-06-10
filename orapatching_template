@@ -1,3 +1,7 @@
+# shutdown listener, database, goldengate
+# if you have DBV enabled, turn this off
+# DBV - as dbv_owner: grant dv_patch_admin to sys;
+
 unzip ${patches}/${reldate}/p${this_combo}_121020_${this_platform}.zip
 cd ${this_combo}
 
