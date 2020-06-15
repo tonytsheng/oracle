@@ -1,0 +1,20 @@
+git branch -a #list all local and remote branches
+
+# create new repo
+git init
+git pull git@host/folder -u
+
+# make changes
+git add . 
+git commit -a #put comments in file
+git push git@host/folder $branch
+
+cd ..
+cp -r old new
+cd new
+git branch
+git checkout -b newbranch
+#do your work
+git add .
+git commit -a
+git push
