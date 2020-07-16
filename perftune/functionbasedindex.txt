@@ -1,0 +1,6 @@
+FROM table1
+WHERE to_date('19700101000000','YYYYMMDD24MISS')=((trunc(eventdate/1000)-5*3600)/86400) >= to_date('21-April-2019')
+
+create index tsheng1
+on table1
+to_date('19700101000000','YYYYMMDD24MISS')=((trunc(eventdate/1000)-5*3600)/86400);
