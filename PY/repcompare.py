@@ -3,7 +3,7 @@ import time
 import socket
 import array
 import os
-from collections impot defaultdict
+from collections import defaultdict
 
 # PrintMsg
 def PrintMsg (msg):
@@ -12,7 +12,7 @@ def PrintMsg (msg):
 # ExecSQL
 def ExecSql (user, pw, file_in, file_out):
     sqlcall = "sqlplus -S " + user + "/" + pw + "@" + sid + "@" + file_in + \
-        " | egrep -v '\---|rows|COUNT|PL\/SQL' | sed '/^$/d' > file_out
+        " | egrep -v '\---|rows|COUNT|PL\/SQL' | sed '/^$/d'" > file_out
     os.systemcall(sqlcall)
 
 host = socket.gethostname().split('.',1)[0]
@@ -29,7 +29,7 @@ sql_rowcount.write("  for t in (select table_name from user_tables order by \
     table_name) loop\n")
 sql_rowcount.write("   execute immediate 'select count(*) from || t.table_name \
     into val;\n")
-sql_rowcount.write("    dbms_output.put_line (t.table_name || ":" || val);\n")
+sql_rowcount.write("    dbms_output.put_line (t.table_name || ':' || val);\n")
 sql_rowcount.write("end loop;\n")
 sql_rowcount.write("end;\n")
 sql_rowcount.write("\n")
@@ -46,7 +46,7 @@ with open(ssirep, 'r') as repfile:
             rephost = row[2]
             repdb = row[3]
             PrintMsg("PRIHOST: " + prihost + " | pridb: " + pridb + \
-                     "| REPHOST: " + rephost + " | repdb: " | repdb)
+                     "| REPHOST: " + rephost + " | repdb: " = repdb)
 repfile.close()
 
 dbs = [pridb, repdb]
