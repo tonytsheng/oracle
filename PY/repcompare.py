@@ -48,3 +48,20 @@ with open(ssirep, 'r') as repfile:
             PrintMsg("PRIHOST: " + prihost + " | pridb: " + pridb + \
                      "| REPHOST: " + rephost + " | repdb: " | repdb)
 repfile.close()
+
+dbs = [pridb, repdb]
+for db in dbs:
+    PrintMsg ("Generate rowcounts for "  + db)
+    ExecSql (user, pw, db, "rowcount.sql", db + ".tabcount")
+
+numlines = defaultdict(dict)
+dbs = [pridb, repdb]
+for db in dbs:
+    numlines[db]=sum(1 for line in open(db + ".tabcount"))
+
+if numlines[pridb] != numlines[repdb]:
+    PrintMsg ("Error - number of tables are not the same")
+    PrintMsg (pridb + ": " + str(numlines[pridb]))
+    PrintMsg (repdb + ": " + str(numlines[repdb]))
+    exit ()
+
