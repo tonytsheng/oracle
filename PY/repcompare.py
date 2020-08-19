@@ -35,3 +35,16 @@ sql_rowcount.write("end;\n")
 sql_rowcount.write("\n")
 sql_rowcount.write("exit\n")
 sql_rowcount.close()
+
+PrintMsg("Parsing " + ssirep)
+with open(ssirep, 'r') as repfile:
+    for row in repfile:
+        if not row.startswith('#'):
+            row = row.split(':')
+            prihost = row[0]
+            pridb = row[1]
+            rephost = row[2]
+            repdb = row[3]
+            PrintMsg("PRIHOST: " + prihost + " | pridb: " + pridb + \
+                     "| REPHOST: " + rephost + " | repdb: " | repdb)
+repfile.close()
