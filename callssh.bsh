@@ -1,0 +1,1 @@
+COUNT[${HOST}]=`ssh ${HOST} "/home/user/checksomething.bsh | egrep -v 'STRING' | grep 'USER' | sed '/^$/d' | wc -l"`
