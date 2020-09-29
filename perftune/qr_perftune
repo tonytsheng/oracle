@@ -32,3 +32,6 @@ Select output from table(DBMS_WORKLOAD_REPOSITORY.AWR_REPORT_TEXT(
    l_inst_num   IN    NUMBER,
    l_bid        IN    NUMBER,
    l_eid        IN    NUMBER));
+
+exec dbms_monitor.database_trace_on(instance_name=>'SID');
+exec dbms_monitor.database_trace_off(instance_name=>'SID');
