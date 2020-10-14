@@ -1,0 +1,23 @@
+SEEDFILE=$1
+HOST=`hostname -a`
+
+read -s -p "user password:" PW
+
+while read SERVER SEQUENCE SEED;
+do
+  if [ ${SERVER} == ${HOST} ];then
+      VAL=`sqlplus -S user/${PW} <<EQ | egrep -v '\---|rows|NEXTVAL' | sed 's/ //g;/^$/d'
+select ${SEQUENCE}.nextval from dua;
+EQ`
+
+    DIFF=`expr ${SEED} - ${VAL}`
+    echo "${HOST} :: ${VAL} :: ${SEED} :: ${DIFF} :: ${SEQUENCE}"
+sqlplus user/${PW} <<EQ
+alter sequence ${SEQUENCE} increment by ${DIFF};
+select ${SEQUENCE}.nextval from dual;
+alter sequence ${SEQUENCE} increment by 1;
+select ${SEQUENCE}.nextval from dual;
+EQ
+fi
+done < < (awk -F':' "[print $1 " " $2 " " $3}' ${SEEDFILE} )
+
