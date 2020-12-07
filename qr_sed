@@ -8,3 +8,6 @@ sed "s/OLD/NEW/g; s/OLD2/NEW2/g" oldfile > newfile #enclose sed in double quotes
 
 #can use # instead of /
 sed "s#oldfqdir#newfqdir#g" oldfile > newfile
+
+# put a comma at the end of each line except for the last line
+sed '$!s/$/,/' file
